@@ -1,0 +1,5 @@
+google-api-python-client==1.7.10
+celery==4.3.0
+google-auth-oauthlib==0.4.0
+vk-api==11.5.0
+Flask==1.1.1
