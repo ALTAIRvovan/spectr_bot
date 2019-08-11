@@ -20,6 +20,8 @@ def create_survey_before_training(event_time, event):
     answers = ["Приду", "Не могу"]
     end_date = event_time.timestamp()
     poll = vk_app.polls.create(question=question, end_date=end_date, add_answers=answers)
+    random_id = random.randrange(1 << 63)
 
     vk_app.messages.send(peer_id=VK_CURRENT_SPECTRUM_TEAM_CHAT,
+                         random_id=random_id,
                          attachment="poll{}_{}".format(poll.owner_id, poll.id))
