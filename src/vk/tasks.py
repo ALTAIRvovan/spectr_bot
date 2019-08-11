@@ -1,3 +1,5 @@
+import random
+
 from celery_app import celery_app
 from .vk_app import vk_app
 from settings import VK_CURRENT_SPECTRUM_TEAM_CHAT
@@ -5,7 +7,11 @@ from settings import VK_CURRENT_SPECTRUM_TEAM_CHAT
 
 @celery_app.task
 def send_vk_msg(peer_id, text):
-    vk_app.messages.send(peer_id=peer_id, message=text)
+    try:
+        random_id = random.randrange(1 << 63)
+        vk_app.messages.send(peer_id=peer_id, message=text, random_id=random_id)
+    except Exception as ex:
+        print("Exception happen:", ex)
 
 
 @celery_app.task

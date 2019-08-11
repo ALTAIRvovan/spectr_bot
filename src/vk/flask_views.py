@@ -19,7 +19,7 @@ def process_message_new(event_object):
     tokens = str.split(text)
     if str.startswith(tokens[0], "@") and str.startswith(tokens[1], "/"):
         parse_cmd(tokens[1], event_object)
-    elif str.startswith(tokens[1], "@"):
+    elif str.startswith(tokens[0], "/"):
         parse_cmd(tokens[0], event_object)
     return make_response("ok", 200)
 
