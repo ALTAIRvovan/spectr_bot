@@ -1,0 +1,41 @@
+version: "3"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    networks:
+      - backend
+  web:
+    image: fakimipt/spectrum_mipt:dev-latest
+    user: "1000:1000"
+    command: python run_flask.py
+    networks:
+      - backend
+    ports:
+      - "5000:5000"
+    environment:
+      TZ: "Europe/Moscow"
+    volumes:
+      - ./conf:/spectrum/conf:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - rabbitmq
+#    restart: always
+  celery:
+    image: fakimipt/spectrum_mipt:dev-latest
+    user: "1000:1000"
+    command: celery -A run_celery worker -B -l info --schedule=/spectrum/conf/celerybeat-schedule
+    networks:
+      - backend
+    environment:
+      TZ: "Europe/Moscow"
+    volumes:
+      - ./conf:/spectrum/conf:rw
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - rabbitmq
+#    restart: always
+
+networks:
+  backend:

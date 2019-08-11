@@ -23,7 +23,7 @@ def load_credentials():
             flow = InstalledAppFlow.from_client_secrets_file(
                 settings.GOOGLE_CREDENTIALS_PATH,
                 settings.GOOGLE_SCOPE)
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_console() #run_local_server(port=0)
             # Save the credentials for the next run
         with open(settings.GOOGLE_TOKEN_PATH, 'wb') as token:
             pickle.dump(creds, token)

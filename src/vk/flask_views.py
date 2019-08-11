@@ -32,14 +32,21 @@ def process_confirmation(event_obj):
 
 @app.route("/spectrum_bot/vk/callback", methods=["POST"])
 def vk_callback():
-    if not request.json or request.json.get("secret", None) != settings.VK_CALLBACK_SECRET:
+    if not request.json:
         abort(400)
+
     event_type = request.json.get("type", None)
+
+    if event_type == "confirmation":
+        return process_confirmation(request.json)
+
     event_obj = request.json.get("object", None)
     if not event_type or not event_obj:
         abort(400)
-    if event_type == "confirmation":
-        return process_confirmation(request.json)
+
+    if request.json.get("secret", None) != settings.VK_CALLBACK_SECRET:
+        abort(401)
+
     if event_type == "message_new":
         return process_message_new(event_obj)
     make_response("ok", 200)
