@@ -4,7 +4,7 @@ from flask import request, abort, make_response
 
 import settings
 from .flask_app import app
-from vk.tasks import send_vk_msg
+from vk.tasks import send_vk_msg, repost_new_post_into_team_chat
 
 
 def parse_cmd(token, event_object):
@@ -17,10 +17,17 @@ def parse_cmd(token, event_object):
 def process_message_new(event_object):
     text = event_object["text"]
     tokens = str.split(text)
-    if str.startswith(tokens[0], "@") and str.startswith(tokens[1], "/"):
+    if str.startswith(tokens[0], "[") and str.startswith(tokens[1], "/"):
         parse_cmd(tokens[1], event_object)
     elif str.startswith(tokens[0], "/"):
         parse_cmd(tokens[0], event_object)
+    return make_response("ok", 200)
+
+
+def process_wall_post_new(event_object, event):
+    if event_object["owner_id"] != event["group_id"]:
+        return make_response("wrong owner", 401)
+    repost_new_post_into_team_chat.apply_async(args=[event_object["id"], event_object["owner_id"]])
     return make_response("ok", 200)
 
 
@@ -49,4 +56,6 @@ def vk_callback():
 
     if event_type == "message_new":
         return process_message_new(event_obj)
+    elif event_type == "wall_post_new":
+        return process_wall_post_new(event_obj, request.json)
     make_response("ok", 200)

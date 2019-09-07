@@ -1,8 +1,8 @@
 import random
 
 from celery_app import celery_app
-from .vk_app import vk_app
-from settings import VK_CURRENT_SPECTRUM_TEAM_CHAT
+from .vk_app import vk_app, vk_user_app
+from settings import VK_CURRENT_SPECTRUM_TEAM_CHAT, VK_GROUP_ID
 
 
 @celery_app.task
@@ -25,3 +25,11 @@ def create_survey_before_training(event_time, event):
     vk_app.messages.send(peer_id=VK_CURRENT_SPECTRUM_TEAM_CHAT,
                          random_id=random_id,
                          attachment="poll{}_{}".format(poll.owner_id, poll.id))
+
+@celery_app.task
+def repost_new_post_into_team_chat(post_id, owner_id):
+    random_id = random.randrange(1 << 63)
+
+    vk_app.messages.send(peer_id=VK_CURRENT_SPECTRUM_TEAM_CHAT,
+                         random_id=random_id,
+                         attachment="wall{}_{}".format(owner_id, post_id))
